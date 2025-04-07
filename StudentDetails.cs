@@ -7,11 +7,13 @@ using ConsoleTables;
 
 namespace StudentRegistration
 {
+    
 
     public class StudentDetails
     {
         Student student = new Student();
         private List<Student> students = [];
+        DatabaseHelper db = new DatabaseHelper();
 
         public void RegisterStudent()
         {
@@ -59,6 +61,8 @@ namespace StudentRegistration
             };
             students.Add(newStundent);
             Console.WriteLine($"Student With Id =>{id} Registered Succesfully", ConsoleColor.Blue);
+            db.SaveStudent(newStundent);
+
         }
 
         public void RemoveDetais()
@@ -79,6 +83,8 @@ namespace StudentRegistration
                 Console.ForegroundColor = ConsoleColor.Green;
                 Console.WriteLine($"Task {remove.ID} Deleted successfully!", ConsoleColor.Red);
                 Console.ResetColor();
+                db.DeleteStudent(idinput);
+
             }
         }
 
@@ -107,7 +113,10 @@ namespace StudentRegistration
 
                 details.FullName = newName.ToString();
                 details.PhoneNumber = newPhoneNumber.ToString();
-                Console.WriteLine($"Details With Id{details.ID} Updated Sucesfull", ConsoleColor.Green);
+                Console.WriteLine($"Details With Id{details.ID} Updated Sucesfull");
+                db.UpdateStudent(id, newName, newPhoneNumber);
+
+                
             }
 
         }
@@ -157,34 +166,26 @@ namespace StudentRegistration
             return pinandpassword;
         }
 
-        public void ViewStudentDetails()
-        {
-            if (students.Count == 0)
-            {
-                Console.WriteLine("No Student Registered Yet");
+    public void ViewStudentDetails()
+    {
+var studentsFromDb = db.GetAllStudents();
+var table = new ConsoleTable("FullName", "Grade", "D.O.B", "ID", "Guardians/Phone.No", "RegisteredAt", "Gender");
 
-            }
+foreach (var item in studentsFromDb)
+{
+    table.AddRow(
+        item.FullName,
+        item.Grade,
+        item.DateOfBirth,
+        item.ID,
+        item.PhoneNumber,
+        item.RegisteredAt.ToString("yyyy-MM-dd HH:mm"),
+        item.Gender
+    );
+}
+table.Write();
+    }
 
-            var table = new ConsoleTable("FullName", "Grade", "D.O.B", "ID", "Guardians/Phone.No", "RegisteredAt", "Gender");
-            {
-                foreach (var item in students)
-
-                {
-                    table.AddRow(
-                   item.FullName,
-                   item.Grade,
-                   item.DateOfBirth,
-                   item.ID,
-                   item.PhoneNumber,
-                   item.RegisteredAt.ToString("yyyy-MM-dd HH:mm"),
-                   item.Gender
-                    );
-
-                }
-            }
-            table.Write();
-            Console.WriteLine();
-        }
         public void SearchstudentDetail()
         {
             Console.WriteLine("Input The Id of the Student ");
